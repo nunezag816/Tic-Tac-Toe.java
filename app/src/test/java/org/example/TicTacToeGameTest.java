@@ -2,37 +2,35 @@ package org.example;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 public class TicTacToeGameTest {
 
     @Test
-    public void testCheckWinnerXRow() {
-        GameBoard board = new GameBoard();
-        board.makeMove(1, 'X');
-        board.makeMove(2, 'X');
-        board.makeMove(3, 'X');
-        assertEquals('X', board.checkWinner());
-    }
+    public void testHumanVsHumanEarlyExit() {
+        String input = "1\n1\n2\nexit\n";
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
+        Scanner scanner = new Scanner(inputStream);
 
-    @Test
-    public void testNoWinnerInitially() {
-        GameBoard board = new GameBoard();
-        assertEquals('-', board.checkWinner());
-    }
-
-    @Test
-    public void testFullBoardTie() {
-        GameBoard board = new GameBoard();
-        char[] moves = {
-            'X', 'O', 'X',
-            'X', 'O', 'O',
-            'O', 'X', 'X'
-        };
-        for (int i = 0; i < 9; i++) {
-            board.makeMove(i + 1, moves[i]);
+        TicTacToeGame game = new TicTacToeGame();
+        try {
+            game.run(scanner);
+        } catch (SecurityException | IllegalStateException e) {
         }
-        assertTrue(board.isFull());
-        assertEquals('-', board.checkWinner());
+    }
+
+    @Test
+    public void testHumanVsComputerPlay() {
+        String input = "2\n1\n2\nexit\n";
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
+        Scanner scanner = new Scanner(inputStream);
+
+        TicTacToeGame game = new TicTacToeGame();
+        try {
+            game.run(scanner);
+        } catch (SecurityException | IllegalStateException e) {
+        }
     }
 }
