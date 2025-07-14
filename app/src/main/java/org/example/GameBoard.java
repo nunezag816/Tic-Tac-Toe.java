@@ -24,9 +24,9 @@ public class GameBoard {
 
     public char checkWinner() {
         int[][] winConditions = {
-            {0, 1, 2}, {3, 4, 5}, {6, 7, 8}, // rows
-            {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, // columns
-            {0, 4, 8}, {2, 4, 6}             // diagonals
+            {0, 1, 2}, {3, 4, 5}, {6, 7, 8},
+            {0, 3, 6}, {1, 4, 7}, {2, 5, 8},
+            {0, 4, 8}, {2, 4, 6}
         };
 
         for (int[] combo : winConditions) {
@@ -49,8 +49,8 @@ public class GameBoard {
     public void display() {
         System.out.println();
         for (int i = 0; i < 9; i++) {
-            String cell = (board[i] == ' ') ? String.valueOf(i + 1) : String.valueOf(board[i]);
-            System.out.print("  " + cell + "  ");
+            char displayChar = (board[i] == ' ') ? (char) ('1' + i) : board[i];
+            System.out.print("  " + displayChar + "  ");
             if (i % 3 != 2) System.out.print("|");
             if (i % 3 == 2 && i < 8) System.out.println("\n-----+-----+-----");
         }
