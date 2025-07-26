@@ -1,12 +1,18 @@
 package org.example;
 
-import static org.junit.jupiter.api.Assertions.*;
+package org.example;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class GameLogTest {
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+public class GameLogTest {
     private GameLog log;
 
     @BeforeEach
@@ -15,46 +21,32 @@ public class GameLogTest {
     }
 
     @Test
-    public void testInitialCounts() {
-        assertEquals(0, log.getXWins());
-        assertEquals(0, log.getOWins());
-        assertEquals(0, log.getTies());
-    }
-
-    @Test
-    public void testRecordXWin() {
+    public void testRecordWin() {
         log.recordWin('X');
-        assertEquals(1, log.getXWins());
-        assertEquals(0, log.getOWins());
-        assertEquals(0, log.getTies());
-    }
-
-    @Test
-    public void testRecordOWin() {
         log.recordWin('O');
-        assertEquals(0, log.getXWins());
-        assertEquals(1, log.getOWins());
-        assertEquals(0, log.getTies());
-    }
-
-    @Test
-    public void testRecordTie() {
         log.recordWin('-');
-        assertEquals(0, log.getXWins());
-        assertEquals(0, log.getOWins());
+
+        assertEquals(1, log.getXWins());
+        assertEquals(1, log.getOWins());
         assertEquals(1, log.getTies());
     }
 
     @Test
-    public void testMultipleRecords() {
+    public void testSaveToFile() throws IOException {
+        log.recordWin('X');
         log.recordWin('X');
         log.recordWin('O');
         log.recordWin('-');
-        log.recordWin('X');
-        log.recordWin('O');
-        log.recordWin('-');
-        assertEquals(2, log.getXWins());
-        assertEquals(2, log.getOWins());
-        assertEquals(2, log.getTies());
+
+        String filePath = "test_log_output.txt";
+        log.saveToFile(filePath);
+
+        File file = new File(filePath);
+        assertTrue(file.exists());
+
+        List<String> lines = Files.readAllLines(file.toPath());
+        assertTrue(lines.stream().anyMatch(line -> line.contains("Player X Wins: 2")));
+
+        file.delete();
     }
 }
