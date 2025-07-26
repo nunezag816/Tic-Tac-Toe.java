@@ -1,5 +1,7 @@
 package org.example;
 
+package org.example;
+
 import java.util.Random;
 import java.util.Scanner;
 
@@ -8,8 +10,9 @@ public class TicTacToeGame {
     private GameLog log;
     private char currentPlayer;
     private boolean isComputerOpponent;
-    private Random random;
+    private boolean computerGoesFirst;
     private boolean humanIsX;
+    private Random random;
 
     public TicTacToeGame() {
         board = new GameBoard();
@@ -21,8 +24,8 @@ public class TicTacToeGame {
         System.out.println("Welcome to Tic Tac Toe!");
         System.out.println("Select game mode:");
         System.out.println("1: Human vs Human");
-        System.out.println("2: Human vs Computer");
-        System.out.println("3: Computer vs Human");
+        System.out.println("2: Human vs Computer (you go first)");
+        System.out.println("3: Computer vs Human (computer goes first)");
 
         while (true) {
             System.out.print("Enter choice (1, 2, or 3): ");
@@ -52,7 +55,7 @@ public class TicTacToeGame {
 
         while (playAgain) {
             board.resetBoard();
-            currentPlayer = loser; 
+            currentPlayer = loser;
             System.out.println("\n" + currentPlayer + " will go first this round!");
 
             playRound(scanner);
@@ -129,7 +132,9 @@ public class TicTacToeGame {
             return corners[random.nextInt(corners.length)];
         }
 
-        if (board.getMoveCount() == 1 && b[4] == ' ') return 5;
+        if (board.getMoveCount() == 1 && board.isMoveValid(5)) {
+            return 5;
+        }
 
         for (int i = 1; i <= 9; i++) {
             if (board.isMoveValid(i)) {
