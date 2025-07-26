@@ -1,118 +1,71 @@
 package org.example;
 
-import java.util.Random;
+import org.junit.jupiter.api.Test;
+
+import java.io.ByteArrayInputStream;
 import java.util.Scanner;
 
-public class TicTacToeGame {
-    private GameBoard board;
-    private GameLog log;
-    private char currentPlayer;
-    private boolean isComputerOpponent;
-    private Random random;
+import static org.junit.jupiter.api.Assertions.*;
 
-    public TicTacToeGame() {
-        board = new GameBoard();
-        log = new GameLog();
-        random = new Random();
-    }
-    public boolean run(Scanner scanner) {
-        System.out.println("Welcome to Tic Tac Toe!");
-        System.out.println("Select game mode:");
-        System.out.println("1: Human vs Human");
-        System.out.println("2: Human vs Computer");
+class TicTacToeGameTest {
 
-        while (true) {
-            System.out.print("Enter choice (1 or 2): ");
-            String choice = scanner.nextLine().trim();
-            if (choice.equals("1")) {
-                isComputerOpponent = false;
-                break;
-            } else if (choice.equals("2")) {
-                isComputerOpponent = true;
-                break;
-            } else {
-                System.out.println("Invalid choice. Please enter 1 or 2.");
-            }
-        }
+    @Test
+    void testRunHumanVsComputerEarlyExit() {
+        // Simulated inputs:
+        // 2 => Human vs Computer
+        // 1 => Human move (cell 1)
+        // exit => User exits mid-round
+        String input = "2\n1\nexit\n";
+        Scanner scanner = new Scanner(new ByteArrayInputStream(input.getBytes()));
 
-        boolean playAgain = true;
-        char starter = 'X';
+        TicTacToeGame game = new TicTacToeGame();
+        boolean exitedEarly = game.run(scanner);
 
-        while (playAgain) {
-            board.resetBoard();
-            currentPlayer = starter;
-
-            boolean exitedEarly = playRound(scanner);
-            if (exitedEarly) {
-                System.out.println("Goodbye!");
-                return true;
-            }
-
-            char winner = board.checkWinner();
-            if (winner == 'X' || winner == 'O') {
-                log.recordWin(winner);
-                System.out.println("\nPlayer " + winner + " wins!");
-                starter = (winner == 'X') ? 'O' : 'X';
-            } else {
-                log.recordWin('-');
-                System.out.println("\nIt's a tie!");
-            }
-
-            log.printStats();
-
-            System.out.print("\nWould you like to play again (yes/no)? ");
-            String response = scanner.nextLine().trim();
-            if (!response.equalsIgnoreCase("yes")) {
-                playAgain = false;
-            }
-        }
-
-        log.saveToFile("game.txt");
-        System.out.println("\nWriting the game log to disk. Please see game.txt for the final statistics!");
-        return false;
-    }
-    private boolean playRound(Scanner scanner) {
-        int moves = 0;
-        while (moves < 9 && board.checkWinner() == '-') {
-            board.display();
-
-            if (isComputerOpponent && currentPlayer == 'O') {
-                System.out.println("\nComputer (" + currentPlayer + ") is making a move...");
-                int move = getComputerMove();
-                board.makeMove(move, currentPlayer);
-                currentPlayer = 'X';
-                moves++;
-            } else {
-                System.out.print("\n" + currentPlayer + ", what is your move (1-9) or type 'exit' to quit? ");
-                String input = scanner.nextLine().trim();
-
-                if (input.equalsIgnoreCase("exit")) {
-                    return true; 
-                }
-
-                try {
-                    int move = Integer.parseInt(input);
-                    if (!board.isMoveValid(move)) {
-                        System.out.println("Invalid move. Cell is either taken or out of range. Try again.");
-                        continue;
-                    }
-                    board.makeMove(move, currentPlayer);
-                    currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
-                    moves++;
-                } catch (NumberFormatException e) {
-                    System.out.println("Please enter a valid number between 1 and 9.");
-                }
-            }
-        }
-        board.display();
-        return false; 
+        assertTrue(exitedEarly, "Expected game to exit early when user types 'exit'");
     }
 
-    private int getComputerMove() {
-        int move;
-        do {
-            move = random.nextInt(9) + 1;
-        } while (!board.isMoveValid(move));
-        return move;
+    @Test
+    void testRunHumanVsComputerNormalExit() {
+        // Simulated inputs:
+        // 2 => Human vs Computer
+        // 1 => Human move (cell 1)
+        // 5 => Human move
+        // 9 => Human move
+        // no => Do not play again
+        String input = "2\n1\n5\n9\nno\n";
+        Scanner scanner = new Scanner(new ByteArrayInputStream(input.getBytes()));
+
+        TicTacToeGame game = new TicTacToeGame();
+        boolean exitedEarly = game.run(scanner);
+
+        assertFalse(exitedEarly, "Expected game to complete normally, not exit early");
+    }
+
+    @Test
+    void testInvalidMenuInputThenValid() {
+        // Simulates invalid input followed by valid choice
+        // x => invalid
+        // 2 => valid (human vs computer)
+        // 1, 2, 3 => some moves
+        // no => exit
+        String input = "x\n2\n1\n2\n3\nno\n";
+        Scanner scanner = new Scanner(new ByteArrayInputStream(input.getBytes()));
+
+        TicTacToeGame game = new TicTacToeGame();
+        boolean exitedEarly = game.run(scanner);
+
+        assertFalse(exitedEarly);
+    }
+
+    @Test
+    void testHumanVsHumanShortGame() {
+        // Simulates Human vs Human with one move then no replay
+        String input = "1\n1\n2\n3\nno\n";
+        Scanner scanner = new Scanner(new ByteArrayInputStream(input.getBytes()));
+
+        TicTacToeGame game = new TicTacToeGame();
+        boolean exitedEarly = game.run(scanner);
+
+        assertFalse(exitedEarly);
     }
 }
