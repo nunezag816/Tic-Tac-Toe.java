@@ -1,5 +1,7 @@
 package org.example;
 
+package model;
+
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -14,25 +16,17 @@ public class GameLog {
         else ties++;
     }
 
-    public void printStats() {
-        System.out.println("\nThe current log is:");
-        System.out.println("Player X Wins   " + xWins);
-        System.out.println("Player O Wins   " + oWins);
-        System.out.println("Ties            " + ties);
+    public String getFormattedLog() {
+        return String.format("\nPlayer X Wins   %d\nPlayer O Wins   %d\nTies            %d\n",
+                xWins, oWins, ties);
     }
 
-    public void saveToFile(String filename) {
-        try (FileWriter writer = new FileWriter(filename)) {
-            writer.write("Final Game Log:\n");
-            writer.write("Player X Wins   " + xWins + "\n");
-            writer.write("Player O Wins   " + oWins + "\n");
-            writer.write("Ties            " + ties + "\n");
+    public void writeToFile() {
+        try (FileWriter writer = new FileWriter("game.txt")) {
+            writer.write(getFormattedLog());
+            System.out.println("Writing the game log to disk. Please see game.txt for the final statistics!");
         } catch (IOException e) {
-            System.out.println("Failed to write log to disk.");
+            System.out.println("Failed to write game log.");
         }
     }
-
-    public int getXWins() { return xWins; }
-    public int getOWins() { return oWins; }
-    public int getTies() { return ties; }
 }
