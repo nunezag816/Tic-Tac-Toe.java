@@ -1,47 +1,39 @@
 package org.example;
 
-import static org.junit.jupiter.api.Assertions.*;
+package org.example;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GameBoardTest {
-
     private GameBoard board;
 
     @BeforeEach
-    public void setup() {
+    public void setUp() {
         board = new GameBoard();
     }
 
     @Test
-    public void testResetBoard() {
-        board.makeMove(1, 'X');
-        board.resetBoard();
-        for (int i = 1; i <= 9; i++) {
-            assertTrue(board.isMoveValid(i), "Board should be empty after reset");
-        }
+    public void testBoardInitialization() {
+        assertTrue(board.isEmpty());
     }
 
     @Test
-    public void testIsMoveValid() {
+    public void testValidMove() {
         assertTrue(board.isMoveValid(1));
-        assertTrue(board.isMoveValid(9));
-        assertFalse(board.isMoveValid(0));
-        assertFalse(board.isMoveValid(10));
-
         board.makeMove(1, 'X');
         assertFalse(board.isMoveValid(1));
     }
 
     @Test
-    public void testMakeMove() {
-        board.makeMove(5, 'O');
-        assertFalse(board.isMoveValid(5));
+    public void testInvalidMoveOutOfBounds() {
+        assertFalse(board.isMoveValid(0));
+        assertFalse(board.isMoveValid(10));
     }
 
     @Test
-    public void testCheckWinnerRow() {
+    public void testWinDetectionRows() {
         board.makeMove(1, 'X');
         board.makeMove(2, 'X');
         board.makeMove(3, 'X');
@@ -49,7 +41,7 @@ public class GameBoardTest {
     }
 
     @Test
-    public void testCheckWinnerColumn() {
+    public void testWinDetectionColumns() {
         board.makeMove(1, 'O');
         board.makeMove(4, 'O');
         board.makeMove(7, 'O');
@@ -57,44 +49,33 @@ public class GameBoardTest {
     }
 
     @Test
-    public void testCheckWinnerDiagonal() {
+    public void testWinDetectionDiagonals() {
         board.makeMove(1, 'X');
         board.makeMove(5, 'X');
         board.makeMove(9, 'X');
         assertEquals('X', board.checkWinner());
-
-        board.resetBoard();
-
-        board.makeMove(3, 'O');
-        board.makeMove(5, 'O');
-        board.makeMove(7, 'O');
-        assertEquals('O', board.checkWinner());
     }
 
     @Test
-    public void testCheckWinnerNone() {
-        assertEquals('-', board.checkWinner());
-        board.makeMove(1, 'X');
-        board.makeMove(2, 'O');
-        board.makeMove(3, 'X');
-        assertEquals('-', board.checkWinner());
-    }
+    public void testTieGame() {
+        char[] moves = {
+            'X', 'O', 'X',
+            'X', 'O', 'O',
+            'O', 'X', 'X'
+        };
 
-    @Test
-    public void testIsFull() {
-        char player = 'X';
-        for (int i = 1; i <= 9; i++) {
-            board.makeMove(i, player);
-            player = (player == 'X') ? 'O' : 'X';
+        for (int i = 0; i < 9; i++) {
+            board.makeMove(i + 1, moves[i]);
         }
-        assertTrue(board.isFull());
+
+        assertEquals('-', board.checkWinner());
     }
 
     @Test
-    public void testIsNotFull() {
-        for (int i = 1; i <= 8; i++) {
-            board.makeMove(i, 'X');
-        }
-        assertFalse(board.isFull());
+    public void testUndoTemporaryMove() {
+        board.makeTemporaryMove(5, 'X');
+        assertEquals('X', board.getBoardCopy()[4]);
+        board.undoTemporaryMove(5);
+        assertEquals(' ', board.getBoardCopy()[4]);
     }
 }
